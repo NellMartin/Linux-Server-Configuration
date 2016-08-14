@@ -77,7 +77,7 @@ The configuration of a Linux Ubuntu distribution is in a secured remote virtual 
 
 ## Project Step By Step Walkthrough:
 
- **Development Environment: Setup Virtual Machine and SSH into the server**
+### **Development Environment: Setup Virtual Machine and SSH into the server**
  
  1. Access [Udacity Configuration for AWS](https://www.udacity.com/account#!/development_environment)
  2. Create new development environment.
@@ -86,15 +86,24 @@ The configuration of a Linux Ubuntu distribution is in a secured remote virtual 
  5. Allow owner the right to "read" and "write" the file: `$ chmod 600 ~/.ssh/udacity_key.rsa`
  6. SSH into the instance: `$ ssh -i ~/.ssh/udacity_key.rsa  root@public-IP-address-from-step-3`
  
-**Update and upgrade currently installed packages**
+### **Update and upgrade currently installed packages**
 
-1. In terminal type: ` root@ip-10-20-2-57:~# sudo apt-get update`
-2. Upgrade packages to newer versions: `root@ip-10-20-2-57:~# sudo apt-get upgrade`
-3. Remove old or expired packages `root@ip-10-20-2-57:~# sudo apt-get autoremove` 
+1. In terminal type: 
+    
+` root@ip-10-20-2-57:~# sudo apt-get update`
 
-**Create a new user**
-1. Create user: `adduser grader'
-2. Add sudo to grader:  'adduser grader sudo`
+2. Upgrade packages to newer versions: 
+
+  `root@ip-10-20-2-57:~# sudo apt-get upgrade`
+  
+3. Remove old or expired packages 
+
+  `root@ip-10-20-2-57:~# sudo apt-get autoremove` 
+  
+
+### **Create a new user**
+1. Create user: `adduser grader`
+2. Add sudo to grader:  `adduser grader sudo`
 
 **Change SSH Port from 22 to 2200 and Configure SSH access:**
 
@@ -105,9 +114,11 @@ The configuration of a Linux Ubuntu distribution is in a secured remote virtual 
 2. Change Port 22 to Port 2200.
 3. Make sure PasswordAuthentication is set to no
 4. Save and Exit nano editor. 
-5. Restart SSH service for changes: `root@ip-10-20-2-57:~# sudo service ssh restart`
+5. Restart SSH service for changes: 
 
-**Configure UFW to only allow incoming connections for SSH(Port:2200), HTTP(Port:80) and NTP(Port:123)**
+   `root@ip-10-20-2-57:~# sudo service ssh restart`
+
+### **Configure UFW to only allow incoming connections for SSH(Port:2200), HTTP(Port:80) and NTP(Port:123)**
 
 1. Check the status of UFW. Make sure it is inactive: `grader@ip-10-20-2-57:~$ sudo ufw status`
 2. Deny all incoming connections as default so that we can allow the ones we need.`grader@ip-10-20-2-57:~$ sudo ufw default deny incoming`.
@@ -116,13 +127,16 @@ The configuration of a Linux Ubuntu distribution is in a secured remote virtual 
 4. Allow incoming TCP connection on SSH(Port:2200), HTTP(Port:80), NTP(Port:123)
 
 `grader@ip-10-20-2-57:~$ sudo ufw allow 2200/tcp`
+
 `grader@ip-10-20-2-57:~$ sudo ufw allow 80/tcp`
+
 `grader@ip-10-20-2-57:~$ sudo ufw allow 123/tcp`
+
 5. Enable the firewall:
 
 `grader@ip-10-20-2-57:~$ sudo ufw enable`
 
-**Configure local Time Zone to UTC**
+### **Configure local Time Zone to UTC**
 
 1. Open Timezone selection dialog:
 `grader@ip-10-20-2-57:~$ sudo dpkg-reconfigure tzdata`
@@ -130,7 +144,7 @@ The configuration of a Linux Ubuntu distribution is in a secured remote virtual 
 3. Setup ntp daemon to improve time sync:
 `grader@ip-10-20-2-57:~$ sudo apt-get install ntp`
 
-**Install and Configure Apache to serve a Python mod_wsgi application.**
+### **Install and Configure Apache to serve a Python mod_wsgi application.**
 
 1.Install Apache web Server:
     grader@ip-10-20-2-57:~$ `sudo apt-get install apache2`
@@ -153,7 +167,7 @@ The configuration of a Linux Ubuntu distribution is in a secured remote virtual 
 grader@ip-10-20-2-57:~$ `sudo nano /var/www/html/myapp.wsgi`
 
 6. You can test the app by adding the following script in the opened nano editor to be sure that apache has been rightly configured to recognize python applications:
-
+```
 def application(environ, start_response):
     status = '200 ok'
     output = 'Hello World - Its Working'
@@ -162,18 +176,19 @@ def application(environ, start_response):
     start_response(status, response_headers)
     return [output]
 
+```
 7. After you save the file, refresh/reload your browser and you should see Hello World - Its working. This same method will be used for our Catalog app configuration process.
 
 8. Restart Apache server to load mod_wsgi.
 
 `grader@ip-10-20-2-57:~$ sudo apache2ctl restart`
 
-**Install Git and Setup Environment for delopying Flask Application.**
+### **Install Git and Setup Environment for delopying Flask Application.**
 1. Install Git:
 
 grader@ip-10-20-2-57:~$ `sudo apt-get install git`
 
-**Setup process for delopying Flask application**
+### **Setup process for delopying Flask application**
 
 1. Add additional Python package to enable Apache serve Flask applications:
 
@@ -213,14 +228,21 @@ Restart Apache:
 8. Install other necessary packages to successfully deploy the application.
 
  `grader@ip-10-20-2-57:/var/www/Catalog/catalog$ sudo apt-get install python-setuptools`
+ 
  `grader@ip-10-20-2-57:/var/www/Catalog/catalog$ sudo pip install Flask`
+ 
  `grader@ip-10-20-2-57:/var/www/Catalog/catalog$ pip install httplib2`
+ 
  `grader@ip-10-20-2-57:/var/www/Catalog/catalog$ pip install requests`
- `grader@ip-10-20-2-57:/var/www/Catalog/catalog$ sudo pip install flask-seasurf`
+ 
  `grader@ip-10-20-2-57:/var/www/Catalog/catalog$ sudo apt-get install python-pip install psycopg2`
+ 
  `grader@ip-10-20-2-57: psycopg2`
+ 
  `grader@ip-10-20-2-57: pip install oauth2client  `
+ 
  `grader@ip-10-20-2-57:/var/www/Catalog/catalog$ sudo pip install oauth2client`
+ 
  `grader@ip-10-20-2-57:/var/www/Catalog/catalog$ pip install SQLAlchemy`
 
   Restart apache: `sudo apache2ctl restart`.
@@ -237,7 +259,7 @@ Ensure that no remote connections are allowed. It should be default setting.
  grader@ip-10-20-2-57:/var/www/Catalog/catalog$ `sudo nano /etc/postgresql/9.3/main/pg_hba.conf`
 
 
-**Edit your database to point out to the new postgreSQL**
+### **Edit your database to point out to the new postgreSQL**
 
 Open your project 3 database_setup.py file:
 
@@ -265,6 +287,7 @@ Create a user catalog for psql:
 - Change to the default user Postgres.
 
  grader@ip-10-20-2-57:/var/www/html/Catalog$ `sudo su - postgres`
+ ```
 postgres@ip-10-20-25-175:~$ 
 Connect to the postgres system:
 
@@ -275,6 +298,7 @@ psql (9.3.12)
 Type "help" for help.
 
 postgres=# 
+```
 Add the postgres user: catalog and setup users parameters.
 
 - Create user catalog with a login role and password
@@ -316,7 +340,7 @@ If you are getting Internal server error, You can access the Apache error log fi
 
  grader@ip-10-20-2-57:/var/www/html/Catalog$ `sudo tail -30 /var/log/apache2/error.log`
  
-** Get OAUTH-LOGINS (Google+ and Facebook) working.**
+### ** Get OAUTH-LOGINS (Google+ and Facebook) working.**
 
 To fix the google: g_client_secrets.json error, go to the login session of your application, to these sections:
 ```
@@ -349,5 +373,5 @@ To get Facebook authorization working:
 
 - Go to settings and fill in your public IP Addresses
 
-## Future development.
+### **Future development.**
 None expected at the moment.
