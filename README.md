@@ -380,3 +380,7 @@ To get Facebook authorization working:
 
 ### **Future development.**
 None expected at the moment.
+
+### **References**
+Udacity forums
+[Ask Ubuntu.com](http://askubuntu.com/)
