@@ -302,35 +302,40 @@ postgres=#
 Add the postgres user: catalog and setup users parameters.
 
 - Create user catalog with a login role and password
-
+```
 postgres=# CREATE USER catalog WITH PASSWORD 'DB-PASSWORD';
+```
 Note : The DB-PASSWORD, should be the same password you used to create the postgresql engine in your database_setup.py file (Password used:  Train200).
 
 Create a new database called catalog for the user: catalog:
-
+```
 postgres=# CREATE DATABASE catalog WITH OWNER catalog;
 Connect to the database:
 
 postgres=# \c catalog
-Revoke all rights on the database schema, and grant access to catalog only.
 
+```
+Revoke all rights on the database schema, and grant access to catalog only.
+```
 catalog=# REVOKE ALL ON SCHEMA public FROM public;
 catalog=# GRANT ALL ON SCHEMA public TO catalog;
+```
 Exit Postgresql and postgres user:
-
+```
 postgres=# `\q`
 postgres@ip-10-20-2-57~$ exit
-
+```
 Create Postgresql database schema:
 
  grader@ip-10-20-2-57:/var/www/html/Catalog/$ `python database_setup.py`
 We can check that it worked. After you run database_setup.py, Go back to your postgres schema, and connect to catalog database.
-
+```
 postgres@ip-10-20-2-57:~$ psql
 psql (9.3.12)
 Type "help" for help.
 
 postgres=# `\c catalog`
+```
 Restart Apache:
 
  grader@ip-10-20-2-57:/var/www/html/Catalog$ `sudo service apache2 restart`
@@ -340,7 +345,7 @@ If you are getting Internal server error, You can access the Apache error log fi
 
  grader@ip-10-20-2-57:/var/www/html/Catalog$ `sudo tail -30 /var/log/apache2/error.log`
  
-### ** Get OAUTH-LOGINS (Google+ and Facebook) working.**
+### **Get OAUTH-LOGINS (Google+ and Facebook) working.**
 
 To fix the google: g_client_secrets.json error, go to the login session of your application, to these sections:
 ```
