@@ -237,41 +237,36 @@ Install the PostgreSQL database:
 Ensure that no remote connections are allowed. It should be default setting.
 
  grader@ip-10-20-2-57:/var/www/Catalog/catalog$ `sudo nano /etc/postgresql/9.3/main/pg_hba.conf`
- 
+
+
+**Edit your database to point out to the new postgreSQL**
+
 Open your project 3 database_setup.py file:
 
  grader@ip-10-20-2-57: /var/www/html/Catalog$ `sudo nano database_setup.py`
 Effect these changes:
 
-(a) - Go to the line that have this syntax:
+- Go to the line that have this syntax:
 
 engine = create_engine('sqlite:///YOUR-DATABASE-NAME.db')
-(b) - Change the above syntax to a Postgresql database engine like so.
+- Change the above syntax to a Postgresql database engine like so.
 
 engine = create_engine('postgresql://catalog:*DB-PASSWORD*@localhost/catalog')
-you should put down a password where you have DB-PASSWORD. Make sure you rememebr the password because you will need it later.
 
-Also, effect the above changes in your main app.py, and lotsofmenus.py files. I.e the python file you execute to run your project and the one that populates it. In my project 3, my python execution file is project.py. (c.) - Rename your app.py (mine was application.py), to __init__.py
+Also, effect the above changes in your main app.py, and in the lotsofmenus.py files.
 
- grader@ip-10-20-2-57:/var/www/Catalog/catalog$ mv YOUR_APP.py __init__.py
-Note: If you make that change above, make sure your 'catalog.wsgi` file reflects this change. It should read like so:
+**Create new user for database**
 
-#!/user/bin/python
-import sys
-import logging
-logging.basicConfig(stream=sys.stderr)
-sys.path.insert(0,"/var/www/html/Catalog")
-
-J - Create a new user: catalog, add user to PostgreSQL databse with limited permissions to catalog application database.
+ Create a new user: catalog, add user to PostgreSQL databse with limited permissions to catalog application database.
 
 Create a user catalog for psql:
 
- grader@ip-10-20-2-57:/var/www/html/Catalog$ sudo adduser catalog
+ grader@ip-10-20-2-57:/var/www/html/Catalog$ `sudo adduser catalog`
 
-choose a password for that user(Train200).
-Change to the default user Postgres
+- Choose a password for that user(Train200).
+- Change to the default user Postgres.
 
- grader@ip-10-20-2-57:/var/www/Catalog/catalog$ sudo su - postgres
+ grader@ip-10-20-2-57:/var/www/Catalog/catalog$ `sudo su - postgres`
 postgres@ip-10-20-25-175:~$ 
 Connect to the postgres system:
 
@@ -284,17 +279,11 @@ Type "help" for help.
 postgres=# 
 Add the postgres user: catalog and setup users parameters.
 
-(a) - Create user catalog with a login role and password
+- Create user catalog with a login role and password
 
 postgres=# CREATE USER catalog WITH PASSWORD 'DB-PASSWORD';
-Note : The DB-PASSWORD, should be the same password you used to create the postgresql engine in your database_setup.py file(I used Udacity).
+Note : The DB-PASSWORD, should be the same password you used to create the postgresql engine in your database_setup.py file (Password used:  Train200).
 
-(b) - Allow the user catalog to be able to create database tables
-
-postgres=# ALTER USER catalog CREATEDB;
-You can list the roles available in postgres, and their attribute:
-
-postgres=# \du
 Create a new database called catalog for the user: catalog:
 
 postgres=# CREATE DATABASE catalog WITH OWNER catalog;
@@ -307,29 +296,29 @@ catalog=# REVOKE ALL ON SCHEMA public FROM public;
 catalog=# GRANT ALL ON SCHEMA public TO catalog;
 Exit Postgresql and postgres user:
 
-postgres=# \q
+postgres=# `\q`
 postgres@ip-10-20-2-57~$ exit
+
 Create Postgresql database schema:
 
- grader@ip-10-20-2-57:/var/www/Catalog/catalog$ python database_setup.py
+ grader@ip-10-20-2-57:/var/www/html/Catalog/$ `python database_setup.py`
 We can check that it worked. After you run database_setup.py, Go back to your postgres schema, and connect to catalog database.
 
 postgres@ip-10-20-2-57:~$ psql
 psql (9.3.12)
 Type "help" for help.
 
-postgres=# \c catalog
-When you conect to the catalog database, you can view all the relations created by your python database_setup.py command.
-
+postgres=# `\c catalog`
 Restart Apache:
 
- grader@ip-10-20-2-57:/var/www/Catalog/catalog$ sudo service apache2 restart
+ grader@ip-10-20-2-57:/var/www/html/Catalog$ `sudo service apache2 restart`
 In your browser, put in your PUBLIC-IP-ADDRESS : 52.42.109.39. If you followed the steps accordingly, Your applciation should come up.
 
 If you are getting Internal server error, You can access the Apache error log file. To view the last 30 lines in the error log,
 
- grader@ip-10-20-2-57:/var/www/Catalog/catalog$ sudo tail -30 /var/log/apache2/error.log
-K - Get OAUTH-LOGINS (Google+ and Facebook) working.
+ grader@ip-10-20-2-57:/var/www/html/Catalog$ `sudo tail -30 /var/log/apache2/error.log`
+ 
+** Get OAUTH-LOGINS (Google+ and Facebook) working.**
 
 To fix the google: g_client_secrets.json error, go to the login session of your application, to these sections:
 
@@ -342,48 +331,17 @@ Add /var/www/html/Catalog to your code path.:
 app_token = json.loads(
 open(r'/var/www/Catalog/catalog/client_secrets.json', 'r').read())['web']['client_id']
 
-
 oauth_flow:flow_from_clientsecrets('/var/www/html/Catalog/client_secrets.json', scope='')
 Do the same thing for the fb_client_secrets.json file. This is to enable apache locate the file through the proper path.
 
-Open Apache catalog.conf file.
-
- grader@ip-10-20-2-57:/var/www/Catalog/catalog$ sudo nano /etc/apache2/sites-available/catalog.conf
-Paste this in the nano editor for catalog.conf: ServerAlias ec2-52-39-26.86.us-west-2.compute.amazonaws.com
-
-<VirtualHost *:80>
-    ServerName 52.42.109.39
-    ServerAdmin admin@52.42.109.39
-    ServerAlias ec2-52-37-233-140.us-west-2.compute.amazonaws.com
-    WSGIScriptAlias / /var/www/Catalog/catalog.wsgi
-    <Directory /var/www/Catalog/catalog/>
-        Order allow,deny
-        Allow from all
-    </Directory>
-    Alias /static /var/www/Catalog/catalog/static
-    <Directory /var/www/Catalog/catalog/static/>
-        Order allow,deny
-        Allow from all
-    </Directory>
-    ErrorLog ${APACHE_LOG_DIR}/error.log
-    LogLevel warn
-    CustomLog ${APACHE_LOG_DIR}/access.log combined
-</VirtualHost>
-Enable virtual host - catalog.conf
-
- grader@ip-10-20-2-57:/var/www/Catalog/catalog$ sudo a2ensite catalog
 To get Google+ authorization working, do this:
 
-(a) - On the Developer Console: http://console.developers.google.com, select your Project.
+- On the Developer Console: http://console.developers.google.com, select your Project.
+- Navigate to Credentials, and edit your OAuth 2.0 client IDs in the redirect URI'.
+- Copy over the client secrets Json file to AWS server.
 
-(b) - Navigate to Credentials, and edit your OAuth 2.0 client IDs like so:
+To get Facebook authorization working:
 
-oauth2
+- Go to Facebook developers page: `https://developers.facebook.com/ and select your app.
 
-To get Facebook authorization working, do this:
-
-(a) - Go to Facebood developers page: `https://developers.facebook.com/ and select your app.
-
-(b) - Go to settings and fill in your PUBLIC-IP-ADDRESS like so:
-
-facebook oauth
+- Go to settings and fill in your public IP Addresses
