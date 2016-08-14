@@ -11,7 +11,7 @@ Table of Contents
 - [Project Overview]
 - Installed Packages
 - Configuration Summary
-- Project Step by StepWalkthrough
+- Project Step by Step - Walkthrough
 
 ---
 
@@ -37,7 +37,7 @@ http://ec2-52-42-109-39.us-west-2.compute.amazonaws.com/
 
 ## Project Overview
 
-The configuration of a Linux Ubuntu distribution is in a secured remote virtual machine in Amazon Web Service (AWS).  This deployment host a PostgreSQL database built trough ORM using a Flask Framework application.  
+The configuration of a Linux Ubuntu distribution is in a secured remote virtual machine in Amazon Web Service (AWS).  This deployment host an Web application implementing the technologies of: PostgreSQL database built trough ORM, Flask Framework application.  
 
 ---
 
@@ -98,15 +98,15 @@ The configuration of a Linux Ubuntu distribution is in a secured remote virtual 
 2. Add sudo to grader:  'adduser grader sudo`
 
 **Change SSH Port from 22 to 2200 and Configure SSH access:**
+
 1.  Access the config file using nano editor:
 
     `root@ip-10-20-2-57:~# nano /etc/ssh/sshd_config`
 
 2. Change Port 22 to Port 2200.
 3. Make sure PasswordAuthentication is set to no
-4. Change PermitRootLogin without-password to PermitRootLogin no
-5. Save and Exit nano editor. 
-6. Restart SSH service for changes: `root@ip-10-20-2-57:~# sudo service ssh restart`
+4. Save and Exit nano editor. 
+5. Restart SSH service for changes: `root@ip-10-20-2-57:~# sudo service ssh restart`
 
 **Configure UFW to only allow incoming connections for SSH(Port:2200), HTTP(Port:80) and NTP(Port:123)**
 1. Check the status of UFW. Make sure it is inactive: `grader@ip-10-20-2-57:~$ sudo ufw status`
@@ -141,19 +141,19 @@ The configuration of a Linux Ubuntu distribution is in a secured remote virtual 
 
 1. Install mod_wsgi:
 
-'grader@ip-10-20-2-57:~$ sudo apt-get install libapache2-mod-wsgi'
+`grader@ip-10-20-2-57:~$ sudo apt-get install libapache2-mod-wsgi`
 
-2. Configure Apache to handle requests using the WSGI module
+2. Configure Apache to handle requests using the WSGI module.
 
-'grader@ip-10-20-2-57:~$ sudo nano cat/etc/apache2/sites-enabled/000-default.conf'
+`grader@ip-10-20-2-57:~$ sudo nano cat/etc/apache2/sites-enabled/000-default.conf`
 
-3. Add the following line: 'WSGIScriptAlias / /var/www/html/myapp.wsgi' at the end of the <VirtualHost *:80> block, right before the closing </VirtualHost>. Now save and quit the nano editor.
+3. Add the following line: `WSGIScriptAlias / /var/www/html/myapp.wsgi` at the end of the <VirtualHost *:80> block, right before the closing </VirtualHost>. Now save and quit the nano editor.
 
-4. Restart Apache:' sudo apache2ctl restart'
+4. Restart Apache:` sudo apache2ctl restart`
 
 5. Create the myapp.wsgi file that was added to the deafult-conf file: (You can skip this step if you want. We just want to test that apache has been rightly configured to read python files.)
 
-'grader@ip-10-20-2-57:~$ sudo nano /var/www/html/myapp.wsgi'
+`grader@ip-10-20-2-57:~$ sudo nano /var/www/html/myapp.wsgi`
 
 6. You can test the app by adding the following script in the opened nano editor to be sure that apache has been rightly configured to recognize python applications:
 
@@ -164,11 +164,12 @@ def application(environ, start_response):
     response_headers=[('content-type','text/plain'),('content-length', str(len(output)))]
     start_response(status, response_headers)
     return [output]
+
 7. After you save the file, refresh/reload your browser and you should see Hello World - Its working. This same method will be used for our Catalog app configuration process.
 
 8. Restart Apache server to load mod_wsgi.
 
-'grader@ip-10-20-2-57:~$ sudo service apache2 restart'
+`grader@ip-10-20-2-57:~$ sudo apache2ctl restart`
 
 **Install Git and Setup Environment for delopying Flask Application.**
 1. Install Git:
@@ -181,23 +182,20 @@ def application(environ, start_response):
 
 `grader@ip-10-20-2-57:~$ sudo apt-get install python-dev`
 
-2. Enable mod_wsgi if it is not enabled already:
 
-`grader@ip-10-20-2-57:~$ sudo a2enmod wsgi`
 3.  Navigate to the www directory:
 
-`grader@ip-10-20-2-57:~$ cd /var/www`
+`grader@ip-10-20-2-57:~$ cd /var/www/html`
 
 4. Git clone the repository at:  `https://github.com/NellMartin/Catalog.git`
 
 5. Install necesarry dependencies:  
 
 - Install pip (good practice)
-- Install Flask ` grader@ip-10-20-2-57:~$ /var/www/Catalog/catalog$ pip install Flask`
+- Install Flask ` grader@ip-10-20-2-57:~$ /var/www/html/Catalog/$ pip install Flask`
 
 6. Create a catalog.wsgi file in /var/www/html directory (outside Catalog folder).
-7. 
-In the newly created application.wsgi file, paste in the following lines of code.
+7. In the newly created application.wsgi file, paste in the following lines of code.
 
 import sys
 import logging
@@ -208,44 +206,41 @@ sys.path.insert(0, '/var/www/html/Catalog/')
 from application import app as application
 application.secret_key = 'Catalog2016!'
 
-in the conf file add these lines:
-
-
-
 Note: The catalog.wsgi file, looks into the path /var/www/Catalog/catalog for a python file that executes your cloned project 3 file placed in the /catalog folder ( we will be doing this next). That file contains the app = Flask(__name__) expression. If The application that runs your python code is called catalog.py, and catalog.py contains that Flask expression, then using from catalog import app... is the correct syntax. But if your file that runs your python application is __init__.py, and it contains the Flask expression, then it would be proper to do this:
 
 Restart Apache:
 
-grader@ip-10-20-2-57:/var/www/Catalog$ sudo service apache2 restart 
-Clone Your (Project 3 - Item Catalog) respository
+`grader@ip-10-20-2-57:/var/www/Catalog$ sudo service apache2 restart `
 
- grader@ip-10-20-2-57:/var/www/Catalog/catalog$ sudo apt-get install python-setuptools
- grader@ip-10-20-2-57:/var/www/Catalog/catalog$ sudo pip install Flask
- grader@ip-10-20-2-57:/var/www/Catalog/catalog$ pip install httplib2
- grader@ip-10-20-2-57:/var/www/Catalog/catalog$ pip install requests
- grader@ip-10-20-2-57:/var/www/Catalog/catalog$ sudo pip install flask-seasurf
- grader@ip-10-20-2-57:/var/www/Catalog/catalog$ sudo apt-get install python-
-pip install psycopg2
- grader@ip-10-20-2-57: sudo apt-get install libpq-dev
- grader@ip-10-20-2-57: psycopg2
- grader@ip-10-20-2-57: pip install oauth2client  
- grader@ip-10-20-2-57:/var/www/Catalog/catalog$ sudo pip install oauth2client
- grader@ip-10-20-2-57:/var/www/Catalog/catalog$ pip install SQLAlchemy
-Restart apache: sudo apache2ctl restart.
+8. Install other necessary packages to successfully deploy the application.
 
+ `grader@ip-10-20-2-57:/var/www/Catalog/catalog$ sudo apt-get install python-setuptools`
+ `grader@ip-10-20-2-57:/var/www/Catalog/catalog$ sudo pip install Flask`
+ `grader@ip-10-20-2-57:/var/www/Catalog/catalog$ pip install httplib2`
+ `grader@ip-10-20-2-57:/var/www/Catalog/catalog$ pip install requests`
+ `grader@ip-10-20-2-57:/var/www/Catalog/catalog$ sudo pip install flask-seasurf`
+ `grader@ip-10-20-2-57:/var/www/Catalog/catalog$ sudo apt-get install python-pip install psycopg2`
+ `grader@ip-10-20-2-57: psycopg2`
+ `grader@ip-10-20-2-57: pip install oauth2client  `
+ `grader@ip-10-20-2-57:/var/www/Catalog/catalog$ sudo pip install oauth2client`
+ `grader@ip-10-20-2-57:/var/www/Catalog/catalog$ pip install SQLAlchemy`
+
+  Restart apache: `sudo apache2ctl restart`.
 
 Install and configure PostgreSQL with default settings to not allow remote Connection:
 
 Install the PostgreSQL database:
 
- grader@ip-10-20-2-57:/var/www/Catalog/catalog$ sudo apt-get install postgresql
- grader@ip-10-20-2-57:/var/www/Catalog/catalog$ sudo apt-get install postgresql-contrib
-Ensure that no remote connections are allowed. It should be default.
+ grader@ip-10-20-2-57:/var/www/Catalog/catalog$ `sudo apt-get install postgresql`
+ grader@ip-10-20-2-57:/var/www/Catalog/catalog$ `sudo apt-get install postgresql-contrib`
+ 
+Ensure that no remote connections are allowed. It should be default setting.
 
- grader@ip-10-20-2-57:/var/www/Catalog/catalog$ sudo nano /etc/postgresql/9.3/main/pg_hba.conf
+ grader@ip-10-20-2-57:/var/www/Catalog/catalog$ `sudo nano /etc/postgresql/9.3/main/pg_hba.conf`
+ 
 Open your project 3 database_setup.py file:
 
- grader@ip-10-20-2-57:/var/www/Catalog/catalog$ sudo nano database_setup.py
+ grader@ip-10-20-2-57: /var/www/html/Catalog$ `sudo nano database_setup.py`
 Effect these changes:
 
 (a) - Go to the line that have this syntax:
