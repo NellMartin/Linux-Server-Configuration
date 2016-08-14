@@ -2,13 +2,13 @@
 Linux deployment of a web application using PostgreSQL, Python, and Flask framework, in a Linux environment.
 
 ---
-Linux distribution on a virtual machine, prepared to host web applications, install updates and securing it from a number of attack vectors.
+This project consist of a Linux distribution (Ubuntu 14.04) on a virtual machine prepared to host web applications.  Management and configuration is showcased in this project.  Several tasks included: install updates and securing it from a number of attack vectors, configuration of ports, and installation of PostgreSQL database.
 
-This Project is in fulfilment of the Project 5 [Udacity Full Stack Web Developer Nanodegree Program](https://www.udacity.com/course/full-stack-web-developer-nanodegree--nd004). It deploys Project 3 "Item Catalog App" on the virtual machine of Amazon Web Serices. 
+This Project is in fulfilment of the Project 5 [Udacity Full Stack Web Developer Nanodegree Program](https://www.udacity.com/course/full-stack-web-developer-nanodegree--nd004). It deploys Project 3 "Catalog App" on the virtual machine of Amazon Web Services. 
 
 Table of Contents
-- [Project Access]
-- [Project Overview]
+- Project Access
+- Project Overview
 - Installed Packages
 - Configuration Summary
 - Project Step by Step - Walkthrough
@@ -37,14 +37,14 @@ http://ec2-52-42-109-39.us-west-2.compute.amazonaws.com/
 
 ## Project Overview
 
-The configuration of a Linux Ubuntu distribution is in a secured remote virtual machine in Amazon Web Service (AWS).  This deployment host an Web application implementing the technologies of: PostgreSQL database built trough ORM, Flask Framework application.  
+The configuration of a Linux Ubuntu distribution is in a secured remote virtual machine in Amazon Web Service (AWS).  This deployment host an Web application implementing the technologies of: PostgreSQL database built trough ORM, and a Flask Framework application.  
 
 ---
 
 ## Installed Packages
 
 |**Package Name**|**Description**|
-|:---------------:|:---------------:|
+|---------------|---------------|
 | Finger| Display in very readable format, the information about system users in AWS.|
 | Apache2| HTTP server.|
 | Libapache2-mod-wsgi |  Configuration library to host Python applications in Apache2 server.|
@@ -92,7 +92,6 @@ The configuration of a Linux Ubuntu distribution is in a secured remote virtual 
 2. Upgrade packages to newer versions: `root@ip-10-20-2-57:~# sudo apt-get upgrade`
 3. Remove old or expired packages `root@ip-10-20-2-57:~# sudo apt-get autoremove` 
 
-
 **Create a new user**
 1. Create user: `adduser grader'
 2. Add sudo to grader:  'adduser grader sudo`
@@ -109,6 +108,7 @@ The configuration of a Linux Ubuntu distribution is in a secured remote virtual 
 5. Restart SSH service for changes: `root@ip-10-20-2-57:~# sudo service ssh restart`
 
 **Configure UFW to only allow incoming connections for SSH(Port:2200), HTTP(Port:80) and NTP(Port:123)**
+
 1. Check the status of UFW. Make sure it is inactive: `grader@ip-10-20-2-57:~$ sudo ufw status`
 2. Deny all incoming connections as default so that we can allow the ones we need.`grader@ip-10-20-2-57:~$ sudo ufw default deny incoming`.
 3. Allow all outgoing connections as default.
@@ -133,19 +133,16 @@ The configuration of a Linux Ubuntu distribution is in a secured remote virtual 
 **Install and Configure Apache to serve a Python mod_wsgi application.**
 
 1.Install Apache web Server:
-
-'grader@ip-10-20-2-57:~$ sudo apt-get install apache2'
+    grader@ip-10-20-2-57:~$ `sudo apt-get install apache2`
 
 2. In your browser (Chrome preferably), type in your public ip address: http://ec2-52-42-109-39.us-west-2.compute.amazonaws.com/, and it should return - It works! Ubuntu page.
 
-
 1. Install mod_wsgi:
-
-`grader@ip-10-20-2-57:~$ sudo apt-get install libapache2-mod-wsgi`
+     grader@ip-10-20-2-57:~$ `sudo apt-get install libapache2-mod-wsgi`
 
 2. Configure Apache to handle requests using the WSGI module.
 
-`grader@ip-10-20-2-57:~$ sudo nano cat/etc/apache2/sites-enabled/000-default.conf`
+    `grader@ip-10-20-2-57:~$ sudo nano cat/etc/apache2/sites-enabled/000-default.conf`
 
 3. Add the following line: `WSGIScriptAlias / /var/www/html/myapp.wsgi` at the end of the <VirtualHost *:80> block, right before the closing </VirtualHost>. Now save and quit the nano editor.
 
@@ -153,7 +150,7 @@ The configuration of a Linux Ubuntu distribution is in a secured remote virtual 
 
 5. Create the myapp.wsgi file that was added to the deafult-conf file: (You can skip this step if you want. We just want to test that apache has been rightly configured to read python files.)
 
-`grader@ip-10-20-2-57:~$ sudo nano /var/www/html/myapp.wsgi`
+grader@ip-10-20-2-57:~$ `sudo nano /var/www/html/myapp.wsgi`
 
 6. You can test the app by adding the following script in the opened nano editor to be sure that apache has been rightly configured to recognize python applications:
 
@@ -174,7 +171,7 @@ def application(environ, start_response):
 **Install Git and Setup Environment for delopying Flask Application.**
 1. Install Git:
 
-`grader@ip-10-20-2-57:~$ sudo apt-get install git`
+grader@ip-10-20-2-57:~$ `sudo apt-get install git`
 
 **Setup process for delopying Flask application**
 
@@ -196,7 +193,7 @@ def application(environ, start_response):
 
 6. Create a catalog.wsgi file in /var/www/html directory (outside Catalog folder).
 7. In the newly created application.wsgi file, paste in the following lines of code.
-
+```
 import sys
 import logging
 import os
@@ -204,7 +201,8 @@ logging.basicConfig(stream=sys.stderr)
 sys.path.insert(0, '/var/www/html/Catalog/')
 
 from application import app as application
-application.secret_key = 'Catalog2016!'
+application.secret_key = 'Catalog2016!' 
+```
 
 Note: The catalog.wsgi file, looks into the path /var/www/Catalog/catalog for a python file that executes your cloned project 3 file placed in the /catalog folder ( we will be doing this next). That file contains the app = Flask(__name__) expression. If The application that runs your python code is called catalog.py, and catalog.py contains that Flask expression, then using from catalog import app... is the correct syntax. But if your file that runs your python application is __init__.py, and it contains the Flask expression, then it would be proper to do this:
 
@@ -266,7 +264,7 @@ Create a user catalog for psql:
 - Choose a password for that user(Train200).
 - Change to the default user Postgres.
 
- grader@ip-10-20-2-57:/var/www/Catalog/catalog$ `sudo su - postgres`
+ grader@ip-10-20-2-57:/var/www/html/Catalog$ `sudo su - postgres`
 postgres@ip-10-20-25-175:~$ 
 Connect to the postgres system:
 
@@ -321,23 +319,28 @@ If you are getting Internal server error, You can access the Apache error log fi
 ** Get OAUTH-LOGINS (Google+ and Facebook) working.**
 
 To fix the google: g_client_secrets.json error, go to the login session of your application, to these sections:
-
+```
 app_token = json.loads(
 open('client_secrets.json', 'r').read())['web']['client_id']
 
 oauth_flow:flow_from_clientsecrets('client_secrets.json', scope='')
+```
 Add /var/www/html/Catalog to your code path.:
 
+```
 app_token = json.loads(
 open(r'/var/www/Catalog/catalog/client_secrets.json', 'r').read())['web']['client_id']
 
+
 oauth_flow:flow_from_clientsecrets('/var/www/html/Catalog/client_secrets.json', scope='')
+```
+
 Do the same thing for the fb_client_secrets.json file. This is to enable apache locate the file through the proper path.
 
 To get Google+ authorization working, do this:
 
 - On the Developer Console: http://console.developers.google.com, select your Project.
-- Navigate to Credentials, and edit your OAuth 2.0 client IDs in the redirect URI'.
+- Navigate to Credentials, and edit your OAuth 2.0 client IDs in the redirect URIs'.
 - Copy over the client secrets Json file to AWS server.
 
 To get Facebook authorization working:
@@ -345,3 +348,6 @@ To get Facebook authorization working:
 - Go to Facebook developers page: `https://developers.facebook.com/ and select your app.
 
 - Go to settings and fill in your public IP Addresses
+
+## Future development.
+None expected at the moment.
